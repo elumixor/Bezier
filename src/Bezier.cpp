@@ -3,7 +3,7 @@
 //
 
 #include "Bezier.h"
-#include "Hull.h"
+#include "Polygon.h"
 
 unsigned intersections(const Bezier<Point> &a, const Bezier<Point> &b) {
     // To calculate intersections we try to figure out if the convex hulls of the curves intersect.
@@ -14,8 +14,8 @@ unsigned intersections(const Bezier<Point> &a, const Bezier<Point> &b) {
     // for as much as precision/recursion depth allows.
 
     // Convex hull of a curve is given by its control points
-    Hull hull_a{a.C, a.n + 1};
-    Hull hull_b{b.C, a.n + 1};
+    Polygon hull_a{a.C, a.n + 1};
+    Polygon hull_b{b.C, a.n + 1};
 
 //    if ()
 

@@ -11,8 +11,6 @@
 #include "code_organizers.h"
 #include "util/math.h"
 
-#define COMPARATOR(op) inline bool operator op (const Polynomial& other) const { return n op other.n; }
-
 /// Polynomial class representation
 /// \tparam Vector Generic vector class that supports
 /// <br>          - Addition:                vector + vector -> vector
@@ -68,30 +66,26 @@ public:
     /// \param coefficients Coefficients from the lowest to the highest
     explicit Polynomial(const Vector *const coefficients) :
             n{get_power(arr_len(coefficients) + 1)} {
-        for (size_t i{0}; i <= n; i++)
-            C[i] = coefficients[i];
+        std::copy(coefficients, coefficients + n + 1, C);
     };
 
     /// From array of coefficients, limiting the power
     /// \param coefficients Coefficients from the lowest to the highest
     /// \param power Power
     explicit Polynomial(const Vector *const coefficients, size_t power) : n{get_power(coefficients, power)} {
-        for (size_t i{0}; i <= n; i++)
-            C[i] = coefficients[i];
+        std::copy(coefficients, coefficients + n + 1, C);
     };
 
     /// From initializer list of coefficients
     /// \param coefficients Coefficients from the lowest to the highest
     Polynomial(std::initializer_list<Vector> coefficients) : n{
             get_power(coefficients.begin(), coefficients.size() - 1)} {
-        for (size_t i{0}; i <= n; i++)
-            C[i] = *(coefficients.begin() + i);
+        std::copy(coefficients.begin(), coefficients.end(), C);
     };
 
     /// Copy constructor
     Polynomial(const Polynomial &other) : n{other.n} {
-        for (size_t i{0}; i <= n; i++)
-            C[i] = other.C[i];
+        std::copy(other.C, other.C + n + 1, C);
     }
 
     /// Move constructor
@@ -105,9 +99,7 @@ public:
         n = other.n;
         delete[] C;
         C = new Vector[n + 1];
-        for (size_t i{0}; i <= n; i++)
-            C[i] = other.C[i];
-
+        std::copy(other.C, other.C + n + 1, C);
         return *this;
     }
 
@@ -129,12 +121,14 @@ public:
 
     //region Comparisons
 
+#define COMPARATOR(op) inline bool operator op (const Polynomial& other) const { return n op other.n; }
     COMPARATOR(>)
     COMPARATOR(<)
     COMPARATOR(<=)
     COMPARATOR(>=)
     COMPARATOR(==)
     COMPARATOR(!=)
+#undef COMPARATOR
 
     /// Compares polynomials' powers and coefficients
     /// Note possible floating point number comparison
@@ -442,7 +436,5 @@ template<typename Vector, typename Scalar>
 const Scalar Polynomial<Vector, Scalar>::ZeroS{};
 template<typename Vector, typename Scalar>
 const Polynomial<Vector, Scalar> Polynomial<Vector, Scalar>::ZeroP{};
-
-#undef COMPARATOR
 
 #endif //BEZIER_POLYNOMIAL_H

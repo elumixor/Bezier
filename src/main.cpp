@@ -5,8 +5,8 @@
 #include "util/code_organizers.h"
 #include "logic.h"
 #include "random"
-#include "Hull.h"
-
+#include "Polygon.h"
+#include <list>
 
 #define arg_is(argument) current_arg < argc && strcmp(argv[current_arg], "--" #argument) == 0
 
@@ -72,7 +72,6 @@ void roots(Polynomial<T> polynomial) {
     OUT << "has " << polynomial.roots() << " roots" << ENDL;
 }
 
-//int main(int argc, char *argv[]) {
 int main() {
 //    Polynomial<p2d> p1{{1, 2},
 //                       {3, 4},
@@ -140,38 +139,83 @@ int main() {
 //    OUT << Polynomial<>{4, 4, 8}.integrate();
 //
 //    roots(Polynomial<>{4, 4, 8});
-
+//
 //    OUT << math::sqrt(4) << ENDL;
 //    OUT << math::sqrt(5.0) << ENDL;
-
+//
 //    printf("%.10lf\n", math::sqrt<double>(5.0));
 //    printf("%.10f\n", math::sqrt<float>(5.0));
 
 //    constexpr float precision = math::precision<float>();
 //    constexpr double precision2 = math::precision<double>();
 
-    OUT << Vector{3, 5} * Vector{2, 3} << ENDL;
-    OUT << math::degrees(Vector{0, 1} | (Vector{1, 0})) << ENDL;
+//    OUT << Vector{3, 5} * Vector{2, 3} << ENDL;
+//    OUT << Vector{3, 5}.length() << ENDL;
+    OUT << math::degrees(Vector{0, 1} | (Vector{0, 1})) << ENDL;
     OUT << math::degrees(Vector{0, 1} | (Vector{1, 1})) << ENDL;
-    OUT << (Vector{0, 1}.length()) << ENDL;
-    OUT << (Vector{0, 1} * (Vector{0, 1})) << ENDL;
+    OUT << math::degrees(Vector{0, 1} | (Vector{-1, 1})) << ENDL;
+    OUT << math::degrees(Vector{0, 1} | (Vector{-1, -1})) << ENDL;
+//    OUT << (Vector{0, 1}.length()) << ENDL;
+//    OUT << (Vector{0, 1} * (Vector{0, 1})) << ENDL;
     OUT << "Rad " << (Vector{0, 1} | (Vector{0, 1})) << ENDL;
     OUT << "Deg " << math::degrees(Vector{0, 6} | (Vector{0, 1})) << ENDL;
 
-    Point points[3];
+//    Point points[3];
 
-    OUT << arr_len(points) << ENDL;
+//    OUT << arr_len(points) << ENDL;
 
-    Hull hull{Point{1, 2}, Point{3, 4}, Point{4, 5}, Point{7, 5}, Point{-4, 7}, Point{4, 15}, Point{-4, -15}};
+    Polygon hull{Point{1, 2}, Point{3, 4}, Point{4, 5}, Point{2, 8}, Point{3, 14}, Point{7, 5}, Point{-4, 7}, Point{4, 15},
+              Point{-4, -15}, Point{5, 13}, Point{5, 0}, Point{6, 9}};
 
-    Hull hull2{hull};
-    Hull hull3{points, 3};
+    OUT << hull << ENDL;
+
+    OUT << (hull.contains(Point{0, 0}) ? "contains" : "does not contain") << ENDL;
+
+    Polygon h{Point{1, 3}, Point{4, 2}, Point{1, 4}, Point{3, 7}};
+
+    OUT << h << ENDL;
+    OUT << (h.contains(Point{0, 0}) ? "contains" : "does not contain") << ENDL;
+
+    OUT << "Degrees " << math::degrees((Point{4, 4} - Point{2, 2}) | (Point{4, 2} - Point{2, 2})) << ENDL;
+//    OUT <<
+
+//    std::list<int> ints{};
+//    ints.emplace_back(1);
+//    ints.emplace_back(2);
+//    ints.emplace_back(3);
+//    ints.emplace_back(4);
+//    ints.emplace_front(5);
+//
+//    for (auto x: ints) {
+//        OUT << x << " ";
+//    }
+//    OUT << ENDL;
+//
+//    OUT << *----------------------------------------------------------------ints.begin() << " ";
+
+//    OUT << math::degrees(Vector{0, 1} | Vector{-1, -1}) << ENDL;
+//    OUT << math::degrees(Vector{0, 1} | Vector{1, -1}) << ENDL;
+
+    OUT << math::radians(-180.l) << ENDL;
+
+    OUT << math::modulo<double>(-3.7159, -math::pi<double>()) << ENDL;
+    OUT << "this " << ((Point{4, 15} - Point{3, 14}) | (Point{0} - Point{3, 14})) << ENDL;
+    OUT << "this " << math::modulo((Point{4, 15} - Point{3, 14}) | (Point{0} - Point{3, 14}), math::pi<float>()) << ENDL;
+
+    Polygon polygon1{ Point{0,0}, Point{1,0}, Point{1,1} },
+            polygon2{ Point{0.5,0}, Point{.75,1.5}, Point{0.5,1.5} };
+//
+//    OUT << "BEGIN" << ENDL;
+//    OUT << polygon2.contains({0, 0}) << ENDL;
+//    OUT << polygon2.contains({1, 1}) << ENDL;
+//    OUT << polygon2.contains({1, 0}) << ENDL;
+//    OUT << "END" << ENDL;
+
+    OUT << ((polygon1.intersects(polygon2)) ? "intersect" : "don't intersect") << ENDL;
+
+    OUT << math::degrees((Vector{1,0}) | (Vector{})) << ENDL;
 
     return 0;
-//    x.insert(std::pair<const int ,const A>(1, a));
-//    x[1] = a;
-
-
 
     Params params{};
 

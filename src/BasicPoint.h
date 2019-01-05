@@ -13,15 +13,24 @@
 template<typename T = float>
 class BasicPoint {
     static constexpr T ZeroT{};
+
+    static constexpr T crop_angle(const T angle) {
+        return (angle == math::pi<T>() || angle == -math::pi<T>()) ? ZeroT :
+               angle < -math::pi<T>() ?
+               angle + math::pi<T>() * 2.0 :
+               angle > math::pi<T>() ?
+               angle - math::pi<T>() * 2.0 :
+               angle;
+    }
 public:
     /// Coords
     T x{}, y{};
 
     // Constructors
-    inline constexpr BasicPoint() = default;
-    inline constexpr explicit BasicPoint(T val) : x{val}, y{val} {}
-    inline constexpr BasicPoint(T x, T y) : x{x}, y{y} {}
-    inline constexpr BasicPoint(const BasicPoint &other) : x{other.x}, y{other.y} {}
+    inline constexpr BasicPoint() noexcept = default;
+    inline constexpr explicit BasicPoint(T val) noexcept : x{val}, y{val} {}
+    inline constexpr BasicPoint(T x, T y) noexcept : x{x}, y{y} {}
+    inline constexpr BasicPoint(const BasicPoint &other) noexcept  : x{other.x}, y{other.y} {}
     inline constexpr BasicPoint(BasicPoint &&other) noexcept : x{other.x}, y{other.y} { other.x = other.y = ZeroT; }
 
     // Assignment
@@ -38,20 +47,40 @@ public:
 
     // Arithmetic operations
     inline constexpr BasicPoint operator+(const BasicPoint &other) const { return {x + other.x, y + other.y}; }
+    inline constexpr BasicPoint &operator+=(const BasicPoint &other) const {
+        x += other.x;
+        y += other.y;
+        return *this;
+    }
+
     inline constexpr BasicPoint operator-(const BasicPoint &other) const { return {x - other.x, y - other.y}; }
+    inline constexpr BasicPoint &operator-=(const BasicPoint &other) const {
+        x -= other.x;
+        y -= other.y;
+        return *this;
+    }
+
     inline constexpr BasicPoint operator*(const T &scalar) const { return {x * scalar, y * scalar}; }
     inline constexpr T operator*(const BasicPoint &other) const { return x * other.x + y * other.y; }
-    inline constexpr BasicPoint operator/(const T &scalar) const { return {x / scalar, y / scalar}; }
+    inline constexpr BasicPoint &operator*=(const T &scalar) {
+        x *= scalar;
+        y *= scalar;
+        return *this;
+    }
     inline friend constexpr BasicPoint operator*(const T &scalar, const BasicPoint &p) { return p * scalar; }
+
+    inline constexpr BasicPoint operator/(const T &scalar) const { return {x / scalar, y / scalar}; }
+
+    inline constexpr T operator|(const BasicPoint &other) const {
+        return crop_angle(math::atan2(other.y, other.x) - math::atan2(y, x));
+    }
+    inline constexpr T angle(const BasicPoint &other) const noexcept { return *this | other; }
+
     inline constexpr T length() const {
         return x == ZeroT ? math::abs(y) :
                y == ZeroT ? math::abs(x) : math::sqrt(x * x + y * y); // Improved numeric stability
     }
     inline constexpr T distance(const BasicPoint &other) const { return (*this - other).length(); }
-    inline constexpr T operator|(const BasicPoint &other) const {
-        return math::acos((*this * other) / (length() * other.length()));
-    }
-    inline constexpr T angle(const BasicPoint &other) const { return *this | other; }
 
     // Output
     inline void print() const { OUT << "(" << x << ", " << y << ")\n"; }

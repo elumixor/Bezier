@@ -77,8 +77,7 @@ public:
         n = o.n;
         integrated = o.integrated;
         C = new Point[n + 1];
-        for (int i = 0; i <= n; ++i)
-            C[i] = o.C[i];
+        std::copy(o.C, o.C + n + 1, C);
         return *this;
     };
     Bezier &operator=(Bezier &&o) noexcept {

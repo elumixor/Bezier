@@ -38,6 +38,7 @@
 
 #define OUT std::cout
 #define ENDL std::endl
+#define NEWL OUT << ENDL
 
 #define arr_len(array) (sizeof(array)/sizeof(*array))
 

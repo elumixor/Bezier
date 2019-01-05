@@ -23,9 +23,11 @@ set(src src/main.cpp
         src/util/Polynomial.h
 
         src/logic.h src/logic.cpp
-        src/Bezier.h
+        src/Bezier.h src/Bezier.cpp
 
-        src/BasicPoint.h src/Bezier.cpp src/Hull.cpp src/Hull.h src/BasicPoint.cpp src/util/Path.h)
+        src/BasicPoint.h src/BasicPoint.cpp
+        src/Polygon.cpp src/Polygon.h
+        )
 
 # exe
 add_executable(${PROJECT_NAME} ${src})
