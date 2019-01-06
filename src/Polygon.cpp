@@ -148,8 +148,6 @@ Polygon::Polygon(const Point *points, size_t length) {
     for (auto n{right_bottom}; n && n->next; n = n->next) count++;
     for (auto n{bottom_left}; n && n->next; n = n->next) count++;
 
-    OUT << "Count " << count << ENDL;
-
     this->points = new Point[count];
     size_t i = 0;
 
@@ -180,7 +178,6 @@ bool Polygon::contains(const Point &point) const {
         // Check if vector to the point is "left" from the vector to the next segment
     {
         float angle = ((points[i + 1] - points[i]) | (point - points[i]));
-//        OUT << "Angle1: " << math::degrees(angle) << ENDL;
         if (angle <= 0) return false;
     }
 
@@ -193,7 +190,6 @@ enum Orientation {
 
 inline static Orientation orientation(const Point &a, const Point &b, const Point &c) {
     float angle{(c - b) | (b - a)};
-//    OUT << "Angle: " << angle << ENDL;
     return angle > 0 ? Clockwise : angle < 0 ? Counterclockwise : Collinear;
 }
 
@@ -202,7 +198,10 @@ static bool segments_intersect(const Point &p1, const Point &q1, const Point &p2
     // Inspired by algorithm from https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect
     // We need to check for orientations: A(p1, q1, p2), B(p1, q1, q2), C(p2, q2, p1), D(p2, q2, q1)
 
-    Orientation A{orientation(p1, q1, p2)},
+    OUT << "Checking segments (" << p1 << ", " << q1 << ") and (" << p2 << ", " << q2 << ")" << ENDL;
+
+    Orientation
+            A{orientation(p1, q1, p2)},
             B{orientation(p1, q1, q2)},
             C{orientation(p2, q2, p1)},
             D{orientation(p2, q2, q1)};
@@ -213,7 +212,8 @@ static bool segments_intersect(const Point &p1, const Point &q1, const Point &p2
 
 /// Determine if hulls intersect
 bool Polygon::intersects(const Polygon &other) const {
-    // The task is trivial: go through all points of the first polygon
+
+    // The task is to go through all points of the first polygon
     // and see if the second polygon contains any
 
     // The last point is also the first, so we can skip it
@@ -227,8 +227,10 @@ bool Polygon::intersects(const Polygon &other) const {
     // We need to check if any two line segments intersect
     for (size_t i{0}; i < count - 1; i++)
         for (size_t j{0}; j < other.count - 1; j++)
-            if (segments_intersect(points[i], points[i + 1], other.points[j], other.points[j + 1]))
+            if (segments_intersect(points[i], points[i + 1], other.points[j], other.points[j + 1])) {
+                OUT << "Segments intersect" << ENDL;
                 return true;
+            }
 
     return false;
 }
@@ -246,5 +248,6 @@ std::ostream &operator<<(std::ostream &os, const Polygon &hull) {
     for (size_t i{0}; i < hull.count; i++) os << hull.points[i] << " ";
     return os;
 }
+Polygon::Polygon(const Bezier<Point> &curve) : Polygon(curve.control_points, curve.n + 1) {}
 
 //endregion

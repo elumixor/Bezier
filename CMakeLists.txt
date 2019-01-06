@@ -20,7 +20,6 @@ set(src src/main.cpp
 
         src/util/math.h
         src/util/math.cpp
-        src/util/Polynomial.h
 
         src/logic.h src/logic.cpp
         src/Bezier.h src/Bezier.cpp
@@ -32,3 +31,11 @@ set(src src/main.cpp
 # exe
 add_executable(${PROJECT_NAME} ${src})
 target_link_libraries(${PROJECT_NAME} ${ALL_LIBS})
+
+set(bezier_lib ${PROJECT_NAME}_lib)
+add_library(${bezier_lib} ${src})
+
+include(CTest)
+
+# tests
+add_subdirectory(tests)

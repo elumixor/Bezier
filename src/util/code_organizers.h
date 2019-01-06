@@ -40,6 +40,8 @@
 #define ENDL std::endl
 #define NEWL OUT << ENDL
 
+#define COPY(destination, source, count) std::copy(source, source + count, destination)
+
 #define arr_len(array) (sizeof(array)/sizeof(*array))
 
 #endif //BEZIER_CODE_ORGANIZERS_H

@@ -5,7 +5,11 @@
 #include "Bezier.h"
 #include "Polygon.h"
 
-unsigned intersections(const Bezier<Point> &a, const Bezier<Point> &b) {
+#define RECURSION_LIMIT 5
+
+unsigned intersections(const Bezier<Point> &a, const Bezier<Point> &b, size_t recursion_step) {
+    OUT << "Checking intersections. Recursion step: " << recursion_step << ENDL;
+
     // To calculate intersections we try to figure out if the convex hulls of the curves intersect.
     // If hulls do not intersect, the algorithm is stopped.
     //
@@ -14,10 +18,20 @@ unsigned intersections(const Bezier<Point> &a, const Bezier<Point> &b) {
     // for as much as precision/recursion depth allows.
 
     // Convex hull of a curve is given by its control points
-    Polygon hull_a{a.C, a.n + 1};
-    Polygon hull_b{b.C, a.n + 1};
 
-//    if ()
+    // If polygons do not intersect, then curves also do not intersect
+    if (!Polygon(a).intersects(Polygon(b))) return 0;
 
-    return 0;
+    // Within this precision curves do intersect
+    if (recursion_step == RECURSION_LIMIT) return 1;
+
+    // Otherwise subdivide curves in half
+    auto a_subdivided{a.subdivide()};
+    auto b_subdivided{b.subdivide()};
+
+    // And count their intersections
+    return intersections(a_subdivided.first, b_subdivided.first, recursion_step + 1)
+           + intersections(a_subdivided.first, b_subdivided.second, recursion_step + 1)
+           + intersections(a_subdivided.second, b_subdivided.first, recursion_step + 1)
+           + intersections(a_subdivided.second, b_subdivided.second, recursion_step + 1);
 }

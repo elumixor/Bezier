@@ -27,10 +27,10 @@ int generate(const Params &params) {
         for (Point &p: points)
             p = {math::random_float(), math::random_float()};
 
-        curves.push_front(Bezier<Point>(point_count, points));
+        curves.push_front(Bezier<Point>(points, point_count));
 
 #ifdef VERBOSE
-        OUT << ENDL;
+        NEWL;
 #endif
     }
 
