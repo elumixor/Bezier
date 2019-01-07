@@ -27,20 +27,6 @@ namespace math {
 
     //region Factorial
 
-    template<int N>
-    struct TFactorial {
-        enum {
-            value = N * TFactorial<N - 1>::value
-        };
-    };
-
-    template<>
-    struct TFactorial<0> {
-        enum {
-            value = 1
-        };
-    };
-
     template<typename T>
     constexpr int factorial(T v) {
         return v <= 0 ? 1 : v * factorial(v - 1);
@@ -48,28 +34,6 @@ namespace math {
     //endregion
 
     //region Range product
-
-    template<int N, int K>
-    struct TRangeProduct {
-        enum {
-            value = N * TRangeProduct<N + 1, K>::value
-        };
-    };
-
-    template<int K>
-    struct TRangeProduct<K, K> {
-        enum {
-            value = K
-        };
-    };
-
-    template<int K>
-    struct TRangeProduct<K + 1, K> {
-        enum {
-            value = 1
-        };
-    };
-
     template<typename T>
     constexpr int range_product(T from, T to) {
         return from > to ? 1 : from == to ? from : from * range_product(from + 1, to);
@@ -94,13 +58,6 @@ namespace math {
     constexpr T modulo(T x, T y) { return x - (int) (x / y) * y; }
 
     //region Signum function
-
-    template<int power>
-    struct TSign {
-        enum {
-            value = power % 2 == 0 ? 1 : -1
-        };
-    };
 
     template<typename T>
     constexpr int sign(T value) {

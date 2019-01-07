@@ -11,6 +11,7 @@
 #include "iostream"
 #include "util/code_organizers.h"
 #include "BasicPoint.h"
+#include "cassert"
 
 /// Bezier curve class
 template<typename Point>

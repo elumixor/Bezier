@@ -8,9 +8,26 @@
 #include <util/code_organizers.h>
 
 TEST(math_test, test_eq) {
-    EXPECT_EQ(1, 1);
-}
-
-TEST(math_test, test_neq) {
-    EXPECT_NE(1, 0);
+//factorial
+//
+//    range_product
+//min
+// max
+//abs
+//equal
+//
+//modulo
+//
+//    sign
+//    pow
+// sqrt
+//     asin
+// acos
+//
+//     atan
+//    atan2
+//
+//    degrees
+//
+//     radians
 }

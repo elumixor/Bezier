@@ -8,6 +8,7 @@
 #include <sstream>
 #include <list>
 #include "Polygon.h"
+#include "algorithm"
 
 /// Helper struct for iteration
 struct Node {
