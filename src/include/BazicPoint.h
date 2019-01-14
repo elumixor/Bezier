@@ -45,6 +45,14 @@ public:
         return *this;
     };
 
+    // Comparisons
+    inline constexpr bool operator==(const BasicPoint &other) const { return x == other.x && y == other.y; }
+    inline constexpr bool operator!=(const BasicPoint &other) const { return !(*this == other); }
+    inline constexpr bool operator>(const BasicPoint &other) const { return length() > other.length(); }
+    inline constexpr bool operator>=(const BasicPoint &other) const { return length() >= other.length(); }
+    inline constexpr bool operator<(const BasicPoint &other) const { return length() < other.length(); }
+    inline constexpr bool operator<=(const BasicPoint &other) const { return length() <= other.length(); }
+
     // Arithmetic operations
     inline constexpr BasicPoint operator+(const BasicPoint &other) const { return {x + other.x, y + other.y}; }
     inline constexpr BasicPoint &operator+=(const BasicPoint &other) const {
@@ -53,7 +61,7 @@ public:
         return *this;
     }
 
-    inline constexpr BasicPoint operator-(const BasicPoint &other) const { return {x - other.x, y - other.y}; }
+     inline constexpr BasicPoint operator-(const BasicPoint &other) const { return {x - other.x, y - other.y}; }
     inline constexpr BasicPoint &operator-=(const BasicPoint &other) const {
         x -= other.x;
         y -= other.y;
@@ -71,10 +79,11 @@ public:
 
     inline constexpr BasicPoint operator/(const T &scalar) const { return {x / scalar, y / scalar}; }
 
-    inline constexpr T operator|(const BasicPoint &other) const {
-        return crop_angle(math::atan2(other.y, other.x) - math::atan2(y, x));
+    // Vector-like operations
+    inline T operator|(const BasicPoint &other) const {
+        return crop_angle(atan2(other.y, other.x) - atan2(y, x));
     }
-    inline constexpr T angle(const BasicPoint &other) const noexcept { return *this | other; }
+    inline T angle(const BasicPoint &other) const noexcept { return *this | other; }
 
     inline constexpr T length() const {
         return x == ZeroT ? math::abs(y) :

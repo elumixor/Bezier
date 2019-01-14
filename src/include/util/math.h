@@ -7,18 +7,19 @@
 
 #include <random>
 #include "float.h"
+#include "util/code_organizers.h"
 
 #define PRECISION_FLOAT 0.000001f
-#define PRECISION_DOUBLE 0.00000000000000001
+#define PRECISION_DOUBLE 0.00000000000001
 #define PI 3.14159265358979323846264338327950288
 
 namespace math {
-    template<typename T>
+    template<typename T = float>
     inline constexpr T pi() { return T{PI}; };
     template<>
     inline constexpr int pi<int>() { return 3; };
 
-    template<typename T>
+    template<typename T = float>
     constexpr T precision();
     template<>
     constexpr float precision<float>() { return PRECISION_FLOAT; }
@@ -27,8 +28,7 @@ namespace math {
 
     //region Factorial
 
-    template<typename T>
-    constexpr int factorial(T v) {
+    constexpr int factorial(int v) {
         return v <= 0 ? 1 : v * factorial(v - 1);
     }
     //endregion
@@ -52,10 +52,13 @@ namespace math {
     constexpr T abs(T value) { return value < 0 ? -value : value; }
 
     template<typename T>
-    constexpr bool equal(T a, T b) { return abs(a - b) < precision<T>(); }
+    constexpr bool equal(T a, T b) { return abs(a - b) < math::precision<T>(); }
+
+    template<>
+    constexpr bool equal<int>(int a, int b) { return a == b; }
 
     template<typename T>
-    constexpr T modulo(T x, T y) { return x - (int) (x / y) * y; }
+    constexpr T modulo(T x, T y) { return x - int(x / y) * y; }
 
     //region Signum function
 
@@ -67,7 +70,7 @@ namespace math {
 
     template<typename T>
     constexpr T pow(T num, size_t _pow) {
-        return (_pow >= sizeof(size_t) * 8) ? 0 : _pow == 0 ? 1 : num * pow(num, _pow - 1);
+        return _pow == 0 ? 1 : (num == 1 ? 1 : num * pow(num, _pow - 1));
     }
     //endregion
 
@@ -150,11 +153,10 @@ namespace math {
 
     template<typename T>
     constexpr T atan2(T x, T y) {
-        return modulo<T>(x > 0 ? math::atan(y / x) :
-               y >= 0 && x < 0 ? math::atan(y / x) + math::pi<T>() :
-               y < 0 && x < 0 ? math::atan(y / x) - math::pi<T>() :
-               y > 0 && x == 0 ? (math::pi<T>() / 2.0) :
-               -(math::pi<T>() / 2.0), pi<T>());
+        return (x > 0 ? math::atan(y / x) :
+                x < 0 ?
+                (y >= 0 ? math::atan(y / x) + math::pi<T>() : math::atan(y / x) - math::pi<T>())
+                      : (y > 0 ? (math::pi<T>() / 2.0) : -(math::pi<T>() / 2.0)));
     }
     //endregion
 

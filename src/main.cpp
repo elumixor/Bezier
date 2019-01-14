@@ -1,143 +1,97 @@
-#include <util/math.h>
-#include <map>
-#include <set>
-#include "util/code_organizers.h"
+//
+// Created by Vladyslav Yazykov on 2019-01-14.
+//
+
 #include "logic.h"
-#include "random"
-#include "Polygon.h"
-#include <list>
+#include "util/code_organizers.h"
+#include "util/math.h"
 
-#define arg_is(argument) current_arg < argc && strcmp(argv[current_arg], "--" #argument) == 0
+#define arg_is(argument) strcmp(argv[current_arg], "--" #argument) == 0
+#define require_arg(condition) require(condition, "Too many arguments given.")
 
-int main() {
 
-//    OUT << math::sqrt(4) << ENDL;
-//    OUT << math::sqrt(5.0) << ENDL;
-//
-//    printf("%.10lf\n", math::sqrt<double>(5.0));
-//    printf("%.10f\n", math::sqrt<float>(5.0));
+/// Application entry point
+int main(int argc, char **argv) {
 
-//    constexpr float precision = math::precision<float>();
-//    constexpr double precision2 = math::precision<double>();
+    require(argc > 1, "Please provide program with arguments. See ./Bezier --help for details.");
 
-//    OUT << Vector{3, 5} * Vector{2, 3} << ENDL;
-//    OUT << Vector{3, 5}.length() << ENDL;
-    OUT << math::degrees(Vector{0, 1} | (Vector{0, 1})) << ENDL;
-    OUT << math::degrees(Vector{0, 1} | (Vector{1, 1})) << ENDL;
-    OUT << math::degrees(Vector{0, 1} | (Vector{-1, 1})) << ENDL;
-    OUT << math::degrees(Vector{0, 1} | (Vector{-1, -1})) << ENDL;
-//    OUT << (Vector{0, 1}.length()) << ENDL;
-//    OUT << (Vector{0, 1} * (Vector{0, 1})) << ENDL;
-    OUT << "Rad " << (Vector{0, 1} | (Vector{0, 1})) << ENDL;
-    OUT << "Deg " << math::degrees(Vector{0, 6} | (Vector{0, 1})) << ENDL;
+    int current_arg{1};
 
-//    Point points[3];
+    //region --help
+    if (arg_is(help)) {
+        require_arg(argc == 2);
 
-//    OUT << arr_len(points) << ENDL;
+        Log("Displaying info for Bezier");
 
-    Polygon hull{Point{1, 2}, Point{3, 4}, Point{4, 5}, Point{2, 8}, Point{3, 14}, Point{7, 5}, Point{-4, 7},
-                 Point{4, 15},
-                 Point{-4, -15}, Point{5, 13}, Point{5, 0}, Point{6, 9}};
+        OUT << "This program counts intersections between two bezier curves." << ENDL;
+        OUT << "Supported arguments:" << ENDL;
 
-    OUT << hull << ENDL;
+        // Help
+        NEWL;
+        OUT << "--help" << ENDL;
+        OUT << "Displays info about program. But you probably already know what --help does..." << ENDL;
 
-    OUT << (hull.contains(Point{0, 0}) ? "contains" : "does not contain") << ENDL;
+        // Test
+        NEWL;
+        OUT << "--test" << ENDL;
+        OUT << "This allows to test the algorithm by manually inputting two custom curves "
+               "and counting their intersections." << ENDL;
 
-    Polygon h{Point{1, 3}, Point{4, 2}, Point{1, 4}, Point{3, 7}};
+        // Random
+        NEWL;
+        OUT << "--random <count>" << ENDL;
+        OUT << "This generates <count> amount of curves and calculates the total number of intersections.\n"
+               "<count> parameter is optional, if not provided, <count> is assumed 50." << ENDL;
 
-    OUT << h << ENDL;
-    OUT << (h.contains(Point{0, 0}) ? "contains" : "does not contain") << ENDL;
+        NEWL;
 
-    OUT << "Degrees " << math::degrees((Point{4, 4} - Point{2, 2}) | (Point{4, 2} - Point{2, 2})) << ENDL;
-//    OUT <<
+        return 0;
+    }
+    //endregion
 
-//    std::list<int> ints{};
-//    ints.emplace_back(1);
-//    ints.emplace_back(2);
-//    ints.emplace_back(3);
-//    ints.emplace_back(4);
-//    ints.emplace_front(5);
-//
-//    for (auto x: ints) {
-//        OUT << x << " ";
-//    }
-//    OUT << ENDL;
-//
-//    OUT << *----------------------------------------------------------------ints.begin() << " ";
+    //region --random
+    if (arg_is(random)) {
+        require_arg(argc <= 3);
 
-//    OUT << math::degrees(Vector{0, 1} | Vector{-1, -1}) << ENDL;
-//    OUT << math::degrees(Vector{0, 1} | Vector{1, -1}) << ENDL;
+        ++current_arg;
 
-    OUT << math::radians(-180.l) << ENDL;
+        int count{DEFAULT_CURVES_COUNT};
+        if (argc >= 3) // Custom count
+        {
+            try {
+                count = std::stoi(argv[2]);
+            } catch (const std::invalid_argument &) {
+                error("Specified curves count is not a valid integer. See --help for details.");
+            }
+        }
 
-    OUT << math::modulo<double>(-3.7159, -math::pi<double>()) << ENDL;
-    OUT << "this " << ((Point{4, 15} - Point{3, 14}) | (Point{0} - Point{3, 14})) << ENDL;
-    OUT << "this " << math::modulo((Point{4, 15} - Point{3, 14}) | (Point{0} - Point{3, 14}), math::pi<float>())
-        << ENDL;
+        get_intersections(random_curves(static_cast<size_t>(count)));
 
-    Polygon polygon1{{0,0}, {5,2}, {0,4}},
-            polygon2{{5,0}, {0,2}, {5,4}};
-//
-//    OUT << "BEGIN" << ENDL;
-//    OUT << polygon2.contains({0, 0}) << ENDL;
-//    OUT << polygon2.contains({1, 1}) << ENDL;
-//    OUT << polygon2.contains({1, 0}) << ENDL;
-//    OUT << "END" << ENDL;
+        pthread_exit(nullptr);
+    }
+    //endregion
 
-    OUT << ((polygon1.intersects(polygon2)) ? "intersect" : "don't intersect") << ENDL;
+    //region --test
+    if (arg_is(test)) {
+        require_arg(argc == 2);
+        Log("Comparing custom curves.");
 
-    OUT << math::degrees((Vector{1, 0}) | (Vector{})) << ENDL;
+        OUT << "Enter two curves to see if they intersect." << ENDL;
+        OUT << "Please use the following syntax for points: (x1, y1) (x2, y2) ... " << ENDL;
+        NEWL;
+        OUT << "Enter first curve\n";
+        auto curve1{get_curve()};
 
-    Bezier<Point> bezier{{0,0}, {5,2}, {0,4}};
-    Bezier<Point> bezier2{{5,0}, {0,2}, {5,4}};
-//    Bezier<Point> bezier3{{0,5}, {0,6}, {1,6}};
+        NEWL;
+        OUT << "Enter second curve\n";
+        auto curve2{get_curve()};
 
-//    auto inters {intersections(bezier, bezier3)};
-    auto inters {intersections(bezier, bezier2)};
-    OUT << "Intersections: " << inters << ENDL;
-//    Bezier<Point> bezier2{{1,0}, {0,1}};
+        get_intersections({curve1, curve2});
 
-    return 0;
+        pthread_exit(nullptr);
+//        return 0;
+    }
+    //endregion
 
-    Params params{};
-
-//    if (argc > 1) {
-//        int current_arg{1};
-//
-//        if (arg_is(help)) {
-//            Log("Displaying info for Bezier");
-//
-//            return 0;
-//        }
-//
-//        if (arg_is(test)) {
-//            Log("Test mode");
-//
-//            return run_test();
-//        }
-//
-//        if (arg_is(count)) {
-//            current_arg++;
-//            params.curves_count = static_cast<size_t>(std::strtol(argv[current_arg++], nullptr, 10));
-//        }
-//
-//        if (arg_is(min)) {
-//            current_arg++;
-//            params.points_min = static_cast<size_t>(std::strtol(argv[current_arg++], nullptr, 10));
-//        }
-//
-//        if (arg_is(max)) {
-//            current_arg++;
-//            params.points_max = static_cast<size_t>(std::strtol(argv[current_arg++], nullptr, 10));
-//        }
-//
-//        require(current_arg == argc, "Unknown arguments format. Please see -help for info.");
-
-    generate(params);
-//    }
-
-// 1. -help - one arg
-// 2. get points from csv file
-
-    return 0;
+    error("Unknown arguments format. Please see --help for info.");
 }

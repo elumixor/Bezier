@@ -8,7 +8,8 @@ include_directories(../../src)
 
 
 set(src
-        main.cpp src/util/math.cpp)
+        main.cpp src/util/math.cpp src/Polygon.cpp
+        src/Bezier.cpp src/intersections.cpp src/poly_helper.cpp src/BazicPoint.cpp src/logic.cpp)
 
 add_executable(${PROJECT_NAME} ${src})
 target_link_libraries(${PROJECT_NAME} ${bezier_lib} gtest gtest_main)

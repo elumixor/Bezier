@@ -31,9 +31,13 @@
 //#define __require_message(condition, message) if (!(condition)) { ERROR(message); CRASH }
 //#define require(...) _variadic_2(__VA_ARGS__, __require_message, __require_simple)(__VA_ARGS__)
 
+#ifdef VERBOSE
+#define Log(message) std::clog << "LOG: " << message << "\n"
+#else
+#define Log(arg)
+#endif
 
-#define Log(message) std::cout << "LOG: " << message << "\n"
-#define error(message) std::cerr << "ERROR: " << message << "\n"; return 1;
+#define error(message) std::cerr << "ERROR: " << message << "\n"; return {};
 #define require(condition, message) if (!(condition)) { error(message) }
 
 #define OUT std::cout

@@ -11,25 +11,23 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g -DVERBOSE")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 include_directories(
-        src)
+        src/include)
 
 # Source files
-set(src src/main.cpp
+set(src
+        src/include/util/code_organizers.h
 
-        src/util/code_organizers.h
+        src/include/util/math.h src/math.cpp
 
-        src/util/math.h
-        src/util/math.cpp
+        src/include/Bezier.h
 
-        src/logic.h src/logic.cpp
-        src/Bezier.h src/Bezier.cpp
+        src/include/BazicPoint.h
+        src/include/Polygon.h src/Polygon.cpp
 
-        src/BasicPoint.h src/BasicPoint.cpp
-        src/Polygon.cpp src/Polygon.h
-        )
+        src/include/logic.h src/logic.cpp)
 
 # exe
-add_executable(${PROJECT_NAME} ${src})
+add_executable(${PROJECT_NAME} ${src} src/main.cpp)
 target_link_libraries(${PROJECT_NAME} ${ALL_LIBS})
 
 set(bezier_lib ${PROJECT_NAME}_lib)

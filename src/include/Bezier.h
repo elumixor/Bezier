@@ -10,7 +10,7 @@
 #include "utility"
 #include "iostream"
 #include "util/code_organizers.h"
-#include "BasicPoint.h"
+#include "BazicPoint.h"
 #include "cassert"
 
 /// Bezier curve class
@@ -48,9 +48,9 @@ public:
 
         //region VERBOSE
 #ifdef VERBOSE
-        OUT << "Creating bezier curve from points: ";
-        for (size_t i{0}; i <= n; i++) OUT << points[i] << ", ";
-        OUT << ENDL;
+//        OUT << "Creating bezier curve from points: ";
+//        for (size_t i{0}; i <= n; i++) OUT << points[i] << (i == n ? "" : ", ");
+//        OUT << ENDL;
 #endif
         //endregion
 
@@ -85,13 +85,14 @@ public:
     //endregion
 
 #ifdef COMPUTE_BEZIER
-    Bezier(const Bezier &other) : n{other.n}, control_points{new Point[n + 1]}, C{new Point[n + 1]}, integrated{other.integrated} {
+    Bezier(const Bezier &other) : n{other.n}, control_points{new Point[n + 1]}, C{new Point[n + 1]},
+                                  integrated{other.integrated} {
         COPY(C, other.C, n + 1);
         COPY(control_points, other.control_points, n + 1);
     }
 
     Bezier(Bezier &&other) noexcept : n{other.n}, control_points{other.control_points},
-                                    C{other.C}, integrated{other.integrated} {
+                                      C{other.C}, integrated{other.integrated} {
         other.C = nullptr;
         other.control_points = nullptr;
     };
@@ -160,12 +161,12 @@ public:
 #ifdef COMPUTE_BEZIER
     /// Calculate parametric curve value at point
     Point operator()(float t) const {
-            Point r{};
-            for (size_t j{0}; j <= n; j++)
-                r += math::pow(t, (int) j) * C[j];
+        Point r{};
+        for (size_t j{0}; j <= n; j++)
+            r += math::pow(t, (int) j) * C[j];
 
-            return r;
-        }
+        return r;
+    }
 #endif
     //endregion
 
@@ -198,9 +199,23 @@ public:
         return {{points_a, levels},
                 {points_b, levels}};
     }
+
+    /// Output operator
+    friend std::ostream &operator<<(std::ostream &os, const Bezier &bezier) {
+        os << "Bezier(";
+        for (size_t i{0}; i <= bezier.n; i++) os << bezier.control_points[i] << (i == bezier.n ? "" : ", ");
+        os << ")" << ENDL;
+
+#ifdef COMPUTE_BEZIER
+        os << "coefficients: ";
+        for (size_t i{0}; i <= bezier.n; i++) os << bezier.C[i] << (i == bezier.n ? "" : ", ");
+        NEWL;
+#endif
+        os << "Degree: " << bezier.n << ENDL;
+
+        return os;
+    }
 };
 
-/// Calculate the number of intersections with the other curve
-unsigned intersections(const Bezier<Point> &a, const Bezier<Point> &b, size_t recursion_step = 0);
 
 #endif // BEZIER_BEZIER_H
