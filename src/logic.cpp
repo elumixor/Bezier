@@ -1,8 +1,6 @@
 #include <util/math.h>
 #include <map>
 #include <set>
-#include "util/code_organizers.h"
-#include "random"
 #include "Polygon.h"
 #include <list>
 #include "logic.h"
@@ -40,12 +38,6 @@ Polygon get_polygon() {
 
     return Polygon(points, static_cast<size_t>(points_count));
 }
-
-struct polygon_pair {
-    size_t at;
-    size_t total;
-    const Polygon *polygons;
-};
 
 unsigned intrs{0};
 
