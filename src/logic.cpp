@@ -7,7 +7,7 @@
 #include <list>
 #include "logic.h"
 
-/// timer
+/// Timer
 template<typename TimePoint>
 std::chrono::milliseconds to_ms(TimePoint tp) {
     return std::chrono::duration_cast<std::chrono::milliseconds>(tp);
@@ -24,15 +24,13 @@ static Point get_point() {
 }
 
 /// Get curve from input
-Bezier<Point> get_curve() {
+Polygon get_polygon() {
     OUT << "Points count: ";
     int points_count;
     std::cin >> points_count;
 
-    OUT << points_count << ENDL;
-
     if (std::cin.fail() || points_count < 2)
-        throw std::invalid_argument("Bezier curve should have at least 2 control points.");
+        throw std::invalid_argument("Polygon should have at least 2 control points.");
 
     Point points[points_count];
 
@@ -40,85 +38,99 @@ Bezier<Point> get_curve() {
         points[i] = get_point();
     }
 
-    return Bezier<Point>(points, static_cast<size_t>(points_count));
+    return Polygon(points, static_cast<size_t>(points_count));
 }
 
-struct curve_pair {
-    const Bezier<Point> &c1;
-    const Bezier<Point> &c2;
+struct polygon_pair {
+    size_t at;
+    size_t total;
+    const Polygon *polygons;
 };
 
 unsigned intrs{0};
 
-void *get_curves_intersections(void *arg) {
-    auto c_pair = static_cast<curve_pair *>(arg);
-    intrs += curve_intersections(c_pair->c1, c_pair->c2);
+Polygon *data{nullptr};
+size_t total{0};
+
+void *get_polygons_intersections(void *) {
+    static size_t called{0};
+    auto start = called++;
+    for (size_t i{start + 1}; i < total; i++)
+        intrs += (data[start]).intersects(data[i]) ? 1 : 0;
+
     pthread_exit(nullptr);
 }
 
-/// get curves intersections
-void get_intersections(const std::forward_list<Bezier<Point>> &curves) {
+/// Get polygons' intersections
+void get_intersections(const std::forward_list<Polygon> &poly) {
+    total = std::distance(std::begin(poly), std::end(poly));
+
+    OUT << "Total: " << total << ENDL;
+    Polygon polygons[total];
+    {
+        size_t i{0};
+        for (const auto &p: poly)
+            polygons[i++] = p;
+
+    }
+
+    data = polygons;
+
     unsigned intersections{0};
 
     //region Sequential
     auto start = std::chrono::high_resolution_clock::now();
 
-    for (auto c1{curves.begin()}; c1 != curves.end(); c1++) {
-        for (auto c2{c1}; ++c2 != curves.end();) { // Omit self intersections
-            intersections += curve_intersections(*c1, *c2);
+    for (size_t i{0}; i < total; ++i) {
+        for (size_t j{i + 1}; j < total; ++j) {
+            intersections += data[i].intersects(data[j]) ? 1 : 0;
         }
     }
+
     auto end = std::chrono::high_resolution_clock::now();
     OUT << "Sequential computation took " << to_ms(end - start).count() << " ms." << ENDL;
     OUT << "Intersections: " << intersections << ENDL;
-    //endregion
 
     //region Parallel
-
-    auto curves_count{std::distance(std::begin(curves), std::end(curves))};
-    auto count{(curves_count * (curves_count - 1)) / 2};
-
-    pthread_t threads[count];
+    pthread_t threads[total];
 
     start = std::chrono::high_resolution_clock::now();
-    long i{0};
-    for (auto c1{curves.begin()}; c1 != curves.end(); c1++) {
-        for (auto c2{c1}; ++c2 != curves.end();) { // Omit self intersections
-            curve_pair c{*c1, *c2};
-            pthread_create(&threads[i++], nullptr, get_curves_intersections, (void *) &c);
-        }
+
+    for (size_t i{0}; i < total; i++) {
+        pthread_create(&threads[i], nullptr, get_polygons_intersections, (void *) &i);
     }
 
-    for (i = 0; i < count; i++) {
+    for (size_t i = 0; i < total; i++)
         pthread_join(threads[i++], nullptr);
-    }
 
     end = std::chrono::high_resolution_clock::now();
     OUT << "Parallel computation took " << to_ms(end - start).count() << " ms." << ENDL;
     OUT << "Intersections: " << intrs << ENDL;
 
+    OUT << "Numeric instability: " <<
+        ((math::max(intrs, intersections) - math::min(intrs, intersections))
+         / (double) math::max(intrs, intersections)) << ENDL;
     //endregion
 }
-std::forward_list<Bezier<Point>> random_curves(size_t count) {
+
+std::forward_list<Polygon> random_polygons(size_t count) {
 #ifdef VERBOSE
-    OUT << "Generating " << count << " bezier curves" << ENDL;
+    OUT << "Generating " << count << " random polygons" << ENDL;
 #endif
 
-    OUT << "Count: " << count << ENDL;
-
-    std::forward_list<Bezier<Point>> curves{};
+    std::forward_list<Polygon> curves{};
 
     for (size_t i{0}; i < count; ++i) {
+
         // Number of control points
         auto point_count{static_cast<size_t>(math::random_int(2, MAX_CURVE_DEGREE + 1))};
 
         Point points[point_count];
 
         // Generate points
-        for (Point &p: points)
+        for (Point &p : points)
             p = {math::random_float(-10, 10), math::random_float(-10, 10)};
-
-        curves.push_front(Bezier<Point>(points, point_count));
+        curves.push_front(Polygon(points, point_count));
 
 #ifdef VERBOSE
         OUT << "Generated bezier curve:\n" << curves.front() << ENDL;
@@ -127,35 +139,4 @@ std::forward_list<Bezier<Point>> random_curves(size_t count) {
     }
 
     return curves;
-}
-
-unsigned curve_intersections(const Bezier<Point> &a, const Bezier<Point> &b, size_t recursion_step) {
-#ifdef VERBOSE
-    OUT << "Checking intersections. Recursion step: " << recursion_step << ENDL;
-#endif
-
-    // To calculate intersections we try to figure out if the convex hulls of the curves intersect.
-    // If hulls do not intersect, the algorithm is stopped.
-    //
-    // Otherwise we subdivide the curves using De Casteljau's algorithm
-    // https://en.wikipedia.org/wiki/De_Casteljau%27s_algorithm
-    // for as much as precision/recursion depth allows.
-
-    // Convex hull of a curve is given by its control points
-
-    // If polygons do not intersect, then curves also do not intersect
-    if (!Polygon(a).intersects(Polygon(b))) return 0;
-
-    // Within this precision curves do intersect
-    if (recursion_step == RECURSION_LIMIT) return 1;
-
-    // Otherwise subdivide curves in half
-    auto a_subdivided{a.subdivide()};
-    auto b_subdivided{b.subdivide()};
-
-    // And count their intersections
-    return curve_intersections(a_subdivided.first, b_subdivided.first, recursion_step + 1)
-           + curve_intersections(a_subdivided.first, b_subdivided.second, recursion_step + 1)
-           + curve_intersections(a_subdivided.second, b_subdivided.first, recursion_step + 1)
-           + curve_intersections(a_subdivided.second, b_subdivided.second, recursion_step + 1);
 }

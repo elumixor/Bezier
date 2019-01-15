@@ -3,7 +3,7 @@ project(Bezier)
 
 set(CMAKE_CXX_STANDARD 14)
 
-#set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_CXX_FLAGS "-Wall -Wextra -pthread")
@@ -18,8 +18,6 @@ set(src
         src/include/util/code_organizers.h
 
         src/include/util/math.h src/math.cpp
-
-        src/include/Bezier.h
 
         src/include/BazicPoint.h
         src/include/Polygon.h src/Polygon.cpp

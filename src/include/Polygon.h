@@ -8,16 +8,24 @@
 #include <ostream>
 #include "BazicPoint.h"
 #include "util/code_organizers.h"
-#include "Bezier.h"
 
 class Polygon {
     size_t count{0};
     Point *points{nullptr};
 public:
+    Polygon() = default;
     Polygon(const Point *points, size_t length);
     Polygon(const Polygon &other);
     Polygon(std::initializer_list<Point> points);
-    Polygon(const Bezier<Point> &curve);
+
+    Polygon &operator=(const Polygon &other) {
+        delete[] points;
+        count = other.count;
+        points = new Point[count];
+        for (size_t i{0}; i < count; i++)
+            points[i] = other.points[i];
+        return *this;
+    }
 
     virtual ~Polygon();
 
@@ -27,7 +35,7 @@ public:
     bool contains(const Point &point) const;
 
     /// Determine if hulls intersect
-    bool intersects(const Polygon& other) const;
+    bool intersects(const Polygon &other) const;
 };
 
 namespace _poly_helper_ {

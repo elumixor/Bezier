@@ -124,13 +124,15 @@ bool Polygon::contains(const Point &point) const {
         if (angle <= 0) return false;
     }
 
+#ifdef VERBOSE
     OUT << "Polygon contains " << point << ENDL;
+#endif
     return true;
 }
 
 /// Determine if hulls intersect
 bool Polygon::intersects(const Polygon &other) const {
-    Log("Checking polygons intersections");
+    INFO("Checking polygons intersections");
 
     // The task is to go through all points of the first polygon
     // and see if the second polygon contains any
@@ -169,7 +171,6 @@ std::ostream &operator<<(std::ostream &os, const Polygon &polygon) {
     for (size_t i{0}; i < polygon.count; i++) os << polygon.points[i] << " ";
     return os;
 }
-Polygon::Polygon(const Bezier<Point> &curve) : Polygon(curve.control_points, curve.n + 1) {}
 
 //endregion
 

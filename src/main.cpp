@@ -6,22 +6,42 @@
 #include "util/code_organizers.h"
 #include "util/math.h"
 
-#define arg_is(argument) strcmp(argv[current_arg], "--" #argument) == 0
-#define require_arg(condition) require(condition, "Too many arguments given.")
-
+#define arg_is(argument) strcmp(argv[1], "--" #argument) == 0
 
 /// Application entry point
 int main(int argc, char **argv) {
+    require(argc < 4, "Too many arguments specified. See --help for details.");
 
-    require(argc > 1, "Please provide program with arguments. See ./Bezier --help for details.");
+    //region no arg
+    if (argc == 1) {
+        OUT << "Enter two polygons to see if they intersect." << ENDL;
+        OUT << "Polygons' convex hulls are formed, and then intersection is determined." << ENDL;
+        OUT << "Please use the following syntax for points: (x1, y1) (x2, y2) ... " << ENDL;
+        NEWL;
 
-    int current_arg{1};
+        try {
+
+            OUT << "Enter first polygon\n";
+            auto p1{get_polygon()};
+
+            NEWL;
+            OUT << "Enter second polygon\n";
+            auto p2{get_polygon()};
+
+            get_intersections({p1, p2});
+
+        } catch (const std::invalid_argument &e) {
+            OUT << e.what() << ENDL;
+            return 1;
+        }
+
+        pthread_exit(nullptr);
+    }
+    //endregion
 
     //region --help
     if (arg_is(help)) {
-        require_arg(argc == 2);
-
-        Log("Displaying info for Bezier");
+        INFO("Displaying info for the program");
 
         OUT << "This program counts intersections between two bezier curves." << ENDL;
         OUT << "Supported arguments:" << ENDL;
@@ -39,23 +59,21 @@ int main(int argc, char **argv) {
 
         // Random
         NEWL;
-        OUT << "--random <count>" << ENDL;
-        OUT << "This generates <count> amount of curves and calculates the total number of intersections.\n"
-               "<count> parameter is optional, if not provided, <count> is assumed 50." << ENDL;
+        OUT << "--random" << ENDL;
+        OUT << "This generates " << DEFAULT_POLYGONS_COUNT
+            << " random polygons. And calculates the number of intersections."
+               "Runs sequentially and in parallel, recording the time.\n" << ENDL;
 
         NEWL;
-
         return 0;
     }
     //endregion
 
     //region --random
     if (arg_is(random)) {
-        require_arg(argc <= 3);
 
-        ++current_arg;
+        int count{DEFAULT_POLYGONS_COUNT};
 
-        int count{DEFAULT_CURVES_COUNT};
         if (argc >= 3) // Custom count
         {
             try {
@@ -65,31 +83,9 @@ int main(int argc, char **argv) {
             }
         }
 
-        get_intersections(random_curves(static_cast<size_t>(count)));
+        get_intersections(random_polygons(static_cast<size_t>(count)));
 
         pthread_exit(nullptr);
-    }
-    //endregion
-
-    //region --test
-    if (arg_is(test)) {
-        require_arg(argc == 2);
-        Log("Comparing custom curves.");
-
-        OUT << "Enter two curves to see if they intersect." << ENDL;
-        OUT << "Please use the following syntax for points: (x1, y1) (x2, y2) ... " << ENDL;
-        NEWL;
-        OUT << "Enter first curve\n";
-        auto curve1{get_curve()};
-
-        NEWL;
-        OUT << "Enter second curve\n";
-        auto curve2{get_curve()};
-
-        get_intersections({curve1, curve2});
-
-        pthread_exit(nullptr);
-//        return 0;
     }
     //endregion
 
