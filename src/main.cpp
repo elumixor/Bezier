@@ -3,8 +3,6 @@
 //
 
 #include "logic.h"
-#include "util/code_organizers.h"
-#include "util/math.h"
 
 #define arg_is(argument) strcmp(argv[1], "--" #argument) == 0
 
@@ -41,6 +39,8 @@ int main(int argc, char **argv) {
 
     //region --help
     if (arg_is(help)) {
+        require(argc == 2, "Unknown arguments after '--help'");
+
         INFO("Displaying info for the program");
 
         OUT << "This program counts intersections between two bezier curves." << ENDL;
@@ -59,10 +59,12 @@ int main(int argc, char **argv) {
 
         // Random
         NEWL;
-        OUT << "--random" << ENDL;
-        OUT << "This generates " << DEFAULT_POLYGONS_COUNT
-            << " random polygons. And calculates the number of intersections."
-               "Runs sequentially and in parallel, recording the time.\n" << ENDL;
+        OUT << "--random <polygons>" << ENDL;
+        OUT << "This generates <polygons> random polygons. "
+               "Then creates a convex hull and calculates the number of intersections."
+               "Runs sequentially and in parallel, recording the time.\n"
+               "Please note that results might differ due to numerical instability "
+               "(mainly from trigonometrical functions)" << ENDL;
 
         NEWL;
         return 0;
@@ -72,22 +74,23 @@ int main(int argc, char **argv) {
     //region --random
     if (arg_is(random)) {
 
-        int count{DEFAULT_POLYGONS_COUNT};
+        int polygons{DEFAULT_POLYGONS_COUNT};
+        int points{MAX_POINTS};
 
         if (argc >= 3) // Custom count
         {
             try {
-                count = std::stoi(argv[2]);
+                polygons = std::stoi(argv[2]);
             } catch (const std::invalid_argument &) {
-                error("Specified curves count is not a valid integer. See --help for details.");
+                error("Specified polygons count is not a valid integer. See --help for details.");
             }
         }
 
-        get_intersections(random_polygons(static_cast<size_t>(count)));
+        get_intersections(random_polygons(static_cast<size_t>(polygons), static_cast<size_t>(points)));
 
         pthread_exit(nullptr);
     }
     //endregion
 
-    error("Unknown arguments format. Please see --help for info.");
+    error("Unknown arguments format. Ssee --help for details.");
 }

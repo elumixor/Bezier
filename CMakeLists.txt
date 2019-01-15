@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-project(Bezier)
+project(Polygons)
 
 set(CMAKE_CXX_STANDARD 14)
 
@@ -28,8 +28,8 @@ set(src
 add_executable(${PROJECT_NAME} ${src} src/main.cpp)
 target_link_libraries(${PROJECT_NAME} ${ALL_LIBS})
 
-set(bezier_lib ${PROJECT_NAME}_lib)
-add_library(${bezier_lib} ${src})
+set(polygons_lib ${PROJECT_NAME}_lib)
+add_library(${polygons_lib} ${src})
 
 include(CTest)
 

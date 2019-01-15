@@ -12,4 +12,4 @@ set(src
         src/Bezier.cpp src/intersections.cpp src/poly_helper.cpp src/BazicPoint.cpp src/logic.cpp)
 
 add_executable(${PROJECT_NAME} ${src})
-target_link_libraries(${PROJECT_NAME} ${bezier_lib} gtest gtest_main)
+target_link_libraries(${PROJECT_NAME} ${polygons_lib} gtest gtest_main)

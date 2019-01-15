@@ -105,7 +105,7 @@ void get_intersections(const std::forward_list<Polygon> &poly) {
     //endregion
 }
 
-std::forward_list<Polygon> random_polygons(size_t count) {
+std::forward_list<Polygon> random_polygons(size_t count, size_t points) {
 #ifdef VERBOSE
     OUT << "Generating " << count << " random polygons" << ENDL;
 #endif
@@ -115,7 +115,7 @@ std::forward_list<Polygon> random_polygons(size_t count) {
     for (size_t i{0}; i < count; ++i) {
 
         // Number of control points
-        auto point_count{static_cast<size_t>(math::random_int(2, MAX_CURVE_DEGREE + 1))};
+        auto point_count{static_cast<size_t>(math::random_int(2, points))};
 
         Point points[point_count];
 

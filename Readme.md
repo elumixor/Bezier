@@ -1,65 +1,43 @@
-## Introduction
-This program is about creating 
-[bezier](https://en.wikipedia.org/wiki/B%C3%A9zier_curve) intersections
-curves and solving their intersections.
+# Polygons
 
-Further on, bezier curve will be referred to as `Bezier`
-
-
-### Bezier curve representation
-`Bezier` is represented in [polynomial form](https://en.wikipedia.org/wiki/B%C3%A9zier_curve#Polynomial_form)
-as an array of coefficients.
-A generic curve is created from a two or more `Points` - 
-generic objects, that support addition and float multiplication:
-```c++
-Point + Point -> Point
-Point * float -> Point
-```
-
-### Constexpr
-`Bezier` class supports constexpr.
+Program determines if polygons' convex hulls intersect.
 
 ### Program flow
-Basic program flow is described as follows:
-1. Get control points
-2. (sequentially)
-    1. Calculate bezier curves
-    2. Calculate intersections
-3. (parallel)
-    1. Calculate bezier curves
-    2. Calculate intersections
-4. Print results and exit
 
+Basic flow (no arguments):
+1. Get points for first polygon
+1. Get points for second polygon
+2. Create convex hulls for both
+3. Look for intersections
 
-## Usage and syntax
-Launch program: `./Bezier` with following arguments:
-1. `-help` - display information about how to use the program
-2. `-test` - interactive mode to test the algorithm:
-    1. Manually enter curves and points.
-    2. Get a point at percentage.
-    3. See if curves intersect. 
-    
-3. Random points generation:
+Alternative flow (--random <polygons>)
+1. for <polygon> times
+    1.1. Generate random points (in (-10, -10) to (10, 10) square)
+    1.2. Create convex hull from points
+2. Check all polygons intersections
 
-`./Bezier -count n -min l -max k` 
+### Algorithm
 
-where `n`, `l`, `k` are positive integer numbers and:
-* `n > 0`,  (default `n = 1000`)
-* `l > 1`,  (default `l = 2`)
-* `k < 10`, (default `k = 6`)
+Polygons' intersections are checked as following:
+1. Check if any point from polygon A is inside polygon B
+    1.1. Is in -> A and B intersect. Return.
+2. Check if any line segments of A intersect any line segment of B
+    1.1. Intersect -> A and B intersect. Return.
+    1.1. Otherwise -> A and B DON'T intersect. Return.
 
-Generates from `n * l` to `n * k` random_float control points, 
-calculate polynomial coefficients and calculate intersections.
+### Results:
 
-Either or all arguments can be omitted, i.e.:
+When polygons's count exceeds around 80-100 elements, parallel implementation becomes more efficient.
 
-`./Bezier`
+Result example:
 
-is equal to
+```
+Total 5000:
+Sequential computation took 7165 ms.
+Intersections: 10663274
+Parallel computation took 3437 ms.
+Intersections: 10022803
+Numeric instability: 0.0600633
+```
 
-`./Bezier -count 1000 -min 2 -max 6`
-
-### Measurement
-
-// todo
-
+Please note that results may differ due to numerical instability.
