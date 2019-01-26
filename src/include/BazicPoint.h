@@ -61,7 +61,7 @@ public:
         return *this;
     }
 
-     inline constexpr BasicPoint operator-(const BasicPoint &other) const { return {x - other.x, y - other.y}; }
+    inline constexpr BasicPoint operator-(const BasicPoint &other) const { return {x - other.x, y - other.y}; }
     inline constexpr BasicPoint &operator-=(const BasicPoint &other) const {
         x -= other.x;
         y -= other.y;

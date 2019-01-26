@@ -8,7 +8,6 @@
 #include <sstream>
 #include <list>
 #include "Polygon.h"
-#include "algorithm"
 
 using namespace _poly_helper_;
 
@@ -174,7 +173,6 @@ std::ostream &operator<<(std::ostream &os, const Polygon &polygon) {
 
 //endregion
 
-
 //region _poly_helper_
 
 void Node::free() {
@@ -251,5 +249,8 @@ Orientation _poly_helper_::orientation(const Point &a, const Point &b, const Poi
     float angle{(b - a) | (c - b)};
     if (math::equal(angle, math::pi()) || math::equal(angle, -math::pi()) || math::equal(angle, 0.f)) return Collinear;
     return angle > 0 ? Clockwise : angle < 0 ? Counterclockwise : Collinear;
+}
+float _poly_helper_::compute_angle(const Point &current, const Point &last, const Point &previous) {
+    return (last - previous) | (current - last);
 }
 //endregion

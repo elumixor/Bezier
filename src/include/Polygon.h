@@ -64,9 +64,7 @@ namespace _poly_helper_ {
     Orientation orientation(const Point &a, const Point &b, const Point &c);
 
     /// Compute the angle between current vector and previous
-    constexpr float compute_angle(const Point &current, const Point &last, const Point &previous) {
-        return (last - previous) | (current - last);
-    }
+    float compute_angle(const Point &current, const Point &last, const Point &previous);
 
     /// Determine if two line segments intersect
     bool segments_intersect(const Point &p1, const Point &q1, const Point &p2, const Point &q2);
@@ -74,6 +72,5 @@ namespace _poly_helper_ {
     /// Form the path form left to top
     Node *form_path(const Point *points, size_t length);
 }
-
 
 #endif //BEZIER_HULL_H
