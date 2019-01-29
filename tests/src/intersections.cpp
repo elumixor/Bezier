@@ -4,7 +4,6 @@
 
 #include <gtest/gtest.h>
 #include <Polygon.h>
-#include "logic.h"
 
 // Polygon intersections
 

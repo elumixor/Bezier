@@ -14,10 +14,10 @@
 
 /// Generate random polygons, find their convex hulls and see if they intersect
 /// \return Total number of intersections
-std::forward_list<Polygon> random_polygons(size_t, size_t);
+std::vector<Polygon> random_polygons(size_t, size_t);
 
 /// Get curves intersections
-void get_intersections(const std::forward_list<Polygon> &);
+void get_intersections(const std::vector<Polygon> &);
 
 /// Get curve from input
 /// \return Bezier curve

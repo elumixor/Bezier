@@ -9,7 +9,7 @@
 #include "util/code_organizers.h"
 #include "util/math.h"
 
-/// Basic 2D point
+/// Basic two-dimensional point
 template<typename T = float>
 class BasicPoint {
     static constexpr T ZeroT{};

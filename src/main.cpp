@@ -2,7 +2,7 @@
 // Created by Vladyslav Yazykov on 2019-01-14.
 //
 
-#include "logic.h"
+#include "application_logic.h"
 
 #define arg_is(argument) strcmp(argv[1], "--" #argument) == 0
 

@@ -3,7 +3,7 @@
 #include <set>
 #include "Polygon.h"
 #include <list>
-#include "logic.h"
+#include "application_logic.h"
 
 /// Timer
 template<typename TimePoint>
@@ -30,18 +30,18 @@ Polygon get_polygon() {
     if (std::cin.fail() || points_count < 2)
         throw std::invalid_argument("Polygon should have at least 2 control points.");
 
-    Point points[points_count];
+    std::vector<Point> points;
 
     for (size_t i{0}; i < static_cast<size_t>(points_count); i++) {
         points[i] = get_point();
     }
 
-    return Polygon(points, static_cast<size_t>(points_count));
+    return Polygon(points);
 }
 
 unsigned intrs{0};
 
-Polygon *data{nullptr};
+std::vector<Polygon> data;
 size_t total{0};
 
 void *get_polygons_intersections(void *) {
@@ -54,16 +54,15 @@ void *get_polygons_intersections(void *) {
 }
 
 /// Get polygons' intersections
-void get_intersections(const std::forward_list<Polygon> &poly) {
+void get_intersections(const std::vector<Polygon> &poly) {
     total = std::distance(std::begin(poly), std::end(poly));
 
     OUT << "Total: " << total << ENDL;
-    Polygon polygons[total];
+    std::vector<Polygon> polygons(poly);
     {
         size_t i{0};
         for (const auto &p: poly)
             polygons[i++] = p;
-
     }
 
     data = polygons;
@@ -84,13 +83,13 @@ void get_intersections(const std::forward_list<Polygon> &poly) {
     OUT << "Intersections: " << intersections << ENDL;
 
     //region Parallel
-    pthread_t threads[total];
+    std::vector<pthread_t> threads;
+    threads.reserve(total);
 
     start = std::chrono::high_resolution_clock::now();
 
-    for (size_t i{0}; i < total; i++) {
+    for (size_t i{0}; i < total; i++)
         pthread_create(&threads[i], nullptr, get_polygons_intersections, (void *) &i);
-    }
 
     for (size_t i = 0; i < total; i++)
         pthread_join(threads[i++], nullptr);
@@ -105,30 +104,34 @@ void get_intersections(const std::forward_list<Polygon> &poly) {
     //endregion
 }
 
-std::forward_list<Polygon> random_polygons(size_t count, size_t points) {
+std::vector<Polygon> random_polygons(size_t polygons_count, size_t max_points_in_polygon) {
 #ifdef VERBOSE
     OUT << "Generating " << count << " random polygons" << ENDL;
 #endif
 
-    std::forward_list<Polygon> curves{};
+    std::vector<Polygon> polygons;
+    polygons.reserve(polygons_count);
 
-    for (size_t i{0}; i < count; ++i) {
+    for (size_t i{0}; i < polygons_count; ++i) {
 
-        // Number of control points
-        auto point_count{static_cast<size_t>(math::random_int(2, points))};
+        // Generate random number of control points
+        auto points_in_polygon{static_cast<size_t>(math::random_int(2, static_cast<int>(max_points_in_polygon)))};
 
-        Point points[point_count];
+        std::vector<Point> points;
+        points.reserve(points_in_polygon);
 
-        // Generate points
-        for (Point &p : points)
-            p = {math::random_float(-10, 10), math::random_float(-10, 10)};
-        curves.push_front(Polygon(points, point_count));
+        // Generate random points
+        for (size_t j{0}; j < points_in_polygon; j++)
+            points.emplace_back(Point(math::random_float(-10, 10), math::random_float(-10, 10)));
+
+        // Create a polygon and add it to a vector
+        polygons.emplace_back(Polygon(points));
 
 #ifdef VERBOSE
-        OUT << "Generated bezier curve:\n" << curves.front() << ENDL;
+        OUT << "Generated polygon:\n" << polygons.front() << ENDL;
         NEWL;
 #endif
     }
 
-    return curves;
+    return polygons;
 }

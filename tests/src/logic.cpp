@@ -3,7 +3,6 @@
 //
 
 #include "gtest/gtest.h"
-#include "logic.h"
 
 TEST(logic, parameter_test) {
 

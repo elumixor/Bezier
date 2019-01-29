@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_CXX_STANDARD 14)
 
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -pthread")
+set(CMAKE_CXX_FLAGS "-Wall -Wextra -pthread -Wall  -Wunreachable-code -pedantic-errors")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -DVERBOSE")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
@@ -22,7 +22,10 @@ set(src
         src/include/BazicPoint.h
         src/include/Polygon.h src/Polygon.cpp
 
-        src/include/logic.h src/logic.cpp)
+        src/poly_helper.cpp
+
+        src/include/application_logic.h
+        src/application_logic.cpp)
 
 # exe
 add_executable(${PROJECT_NAME} ${src} src/main.cpp)
